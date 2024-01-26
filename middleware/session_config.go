@@ -23,6 +23,8 @@ type SessionConfig struct {
 	Credential            interface{}
 	Port                  int
 	UseSSL                bool
+	ConfigurationName     string
+	ConnectionUri         string
 }
 
 func NewSessionConfig() *SessionConfig {
@@ -35,6 +37,16 @@ func (c *SessionConfig) ToArgs() []string {
 	if c.ComputerName != "" {
 		args = append(args, "-ComputerName")
 		args = append(args, utils.QuoteArg(c.ComputerName))
+	}
+
+	if c.ConfigurationName != "" {
+		args = append(args, "-ConfigurationName")
+		args = append(args, utils.QuoteArg(c.ConfigurationName))
+	}
+
+	if c.ConnectionUri != "" {
+		args = append(args, "-ConnectionUri")
+		args = append(args, utils.QuoteArg(c.ConnectionUri))
 	}
 
 	if c.AllowRedirection {
