@@ -5,6 +5,7 @@ package powershell
 import (
 	"fmt"
 	"io"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -28,7 +29,13 @@ type shell struct {
 }
 
 func New(backend backend.Starter) (Shell, error) {
-	handle, stdin, stdout, stderr, err := backend.StartProcess("powershell.exe", "-NoExit", "-Command", "-")
+	shellCmd := ""
+	if runtime.GOOS == "windows" {
+		shellCmd = "powershell.exe"
+	} else {
+		shellCmd = "pwsh"
+	}
+	handle, stdin, stdout, stderr, err := backend.StartProcess(shellCmd, "-NoExit", "-Command", "-")
 	if err != nil {
 		return nil, err
 	}
