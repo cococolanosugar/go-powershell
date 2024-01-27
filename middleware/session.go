@@ -29,6 +29,8 @@ func NewSession(upstream Middleware, config *SessionConfig) (Middleware, error) 
 	name := "goSess" + utils.CreateRandomString(8)
 	args := strings.Join(config.ToArgs(), " ")
 
+	fmt.Printf("try to run: %v\n", fmt.Sprintf("$%s = New-PSSession %s", name, args))
+
 	_, _, err := upstream.Execute(fmt.Sprintf("$%s = New-PSSession %s", name, args))
 	if err != nil {
 		return nil, errors.Annotate(err, "Could not create new PSSession")
@@ -38,10 +40,14 @@ func NewSession(upstream Middleware, config *SessionConfig) (Middleware, error) 
 }
 
 func (s *session) Execute(cmd string) (string, string, error) {
+	fmt.Printf("try to run: %v\n", fmt.Sprintf("Invoke-Command -Session $%s -Script {%s}", s.name, cmd))
+
 	return s.upstream.Execute(fmt.Sprintf("Invoke-Command -Session $%s -Script {%s}", s.name, cmd))
 }
 
 func (s *session) Exit() {
+	fmt.Printf("try to run: %v\n", fmt.Sprintf("Disconnect-PSSession -Session $%s", s.name))
+
 	s.upstream.Execute(fmt.Sprintf("Disconnect-PSSession -Session $%s", s.name))
 	s.upstream.Exit()
 }
